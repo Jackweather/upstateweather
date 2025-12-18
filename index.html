@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display PNG</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        img {
+            max-width: 90%;
+            height: auto;
+            border: 2px solid #333;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #333;
+            color: white;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <img id="weatherImage" src="https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_000.png" alt="Weather Image">
+    <div class="buttons">
+        <button id="prevButton">Previous</button>
+        <button id="nextButton">Next</button>
+    </div>
+    <script>
+        const image = document.getElementById('weatherImage');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+
+        // Forecast steps available (0 to 384 in increments of 6)
+        const steps = Array.from({ length: 65 }, (_, i) => i * 6);
+        let currentIndex = 0;
+
+        // Update the image source based on the current index
+        function updateImage() {
+            const step = steps[currentIndex].toString().padStart(3, '0');
+            image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
+        }
+
+        // Event listeners for buttons
+        prevButton.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + steps.length) % steps.length;
+            updateImage();
+        });
+
+        nextButton.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % steps.length;
+            updateImage();
+        });
+
+        // Event listener for arrow keys
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowLeft') {
+                currentIndex = (currentIndex - 1 + steps.length) % steps.length;
+                updateImage();
+            } else if (event.key === 'ArrowRight') {
+                currentIndex = (currentIndex + 1) % steps.length;
+                updateImage();
+            }
+        });
+    </script>
+</body>
+</html>
