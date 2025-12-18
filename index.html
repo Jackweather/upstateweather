@@ -3,17 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Display PNG</title>
+    <title>Weather Model Viewer</title>
     <style>
         body {
             display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
             margin: 0;
             font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            height: 100vh;
+        }
+        #sidebar {
+            width: 180px;
+            background: #333; /* Updated to match the header color */
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         header {
             width: 100%;
@@ -24,34 +40,26 @@
             font-size: 24px;
             font-weight: bold;
         }
-        .content {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            flex: 1;
-            width: 100%;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
         .image-container {
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
-            padding: 20px 0;
+            margin: 20px 0;
         }
         img {
-            max-width: 70%;
-            max-height: 70%;
+            max-width: 100%;
+            max-height: 70vh;
             border: 2px solid #333;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
         }
         .buttons-container {
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
-            padding: 10px 0;
+            margin-top: 10px;
         }
         button {
             padding: 10px 20px;
@@ -69,10 +77,13 @@
     </style>
 </head>
 <body>
-    <header>
-        Weather Model Viewer
-    </header>
-    <div class="content">
+    <div id="sidebar">
+        <!-- Sidebar is now empty -->
+    </div>
+    <div id="main-content">
+        <header>
+            Weather Model Viewer
+        </header>
         <div class="image-container">
             <img id="weatherImage" src="https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_000.png" alt="Weather Image">
         </div>
