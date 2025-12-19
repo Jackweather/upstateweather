@@ -120,6 +120,20 @@
         const forecastSlider = document.getElementById('forecastSlider');
         const forecastHour = document.getElementById('forecastHour');
 
+        // Preload all images into the browser cache
+        const preloadImages = () => {
+            const images = [];
+            for (let i = 0; i <= 384; i += 6) {
+                const step = i.toString().padStart(3, '0');
+                const img = new Image();
+                img.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
+                images.push(img);
+            }
+        };
+
+        // Call preloadImages on page load
+        preloadImages();
+
         // Update the image source and forecast hour label based on the slider value
         function updateImage() {
             const step = parseInt(forecastSlider.value).toString().padStart(3, '0');
@@ -129,6 +143,23 @@
 
         // Event listener for the slider
         forecastSlider.addEventListener('input', updateImage);
+
+        // Add event listener for left and right arrow keys
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowLeft') {
+                // Decrease slider value by step if not at minimum
+                if (forecastSlider.value > parseInt(forecastSlider.min)) {
+                    forecastSlider.value = parseInt(forecastSlider.value) - parseInt(forecastSlider.step);
+                    updateImage();
+                }
+            } else if (event.key === 'ArrowRight') {
+                // Increase slider value by step if not at maximum
+                if (forecastSlider.value < parseInt(forecastSlider.max)) {
+                    forecastSlider.value = parseInt(forecastSlider.value) + parseInt(forecastSlider.step);
+                    updateImage();
+                }
+            }
+        });
     </script>
 </body>
 </html>
