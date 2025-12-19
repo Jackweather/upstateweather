@@ -146,14 +146,10 @@
             <label for="regionDropdown" style="color: white; font-size: 16px; font-weight: bold;">Region</label>
             <select id="regionDropdown">
                 <option value="" disabled selected>Select Region</option>
-                <option value="main">Main</option> <!-- Added Main option -->
+                <option value="main">Main</option>
                 <option value="northeast">Northeast</option>
+                <option value="prate">Northeast - Prate</option> <!-- Added Prate as a dropdown option -->
             </select>
-            <div id="prateClickableContainer" style="display: none; margin-top: 10px;">
-                <span id="prateClickable" style="color: white; font-size: 16px; font-weight: bold; cursor: pointer; text-decoration: underline;">
-                    Prate
-                </span>
-            </div>
         </div>
         <div id="main-content">
             <div class="image-container">
@@ -170,8 +166,6 @@
         const forecastSlider = document.getElementById('forecastSlider');
         const forecastHour = document.getElementById('forecastHour');
         const regionDropdown = document.getElementById('regionDropdown');
-        const prateClickableContainer = document.getElementById('prateClickableContainer');
-        const prateClickable = document.getElementById('prateClickable');
 
         let isPrateMode = false; // Track if "Prate" mode is active
 
@@ -216,37 +210,35 @@
         // Event listener for the slider
         forecastSlider.addEventListener('input', updateImage);
 
-        // Add click event to "Prate"
-        prateClickable.addEventListener('click', () => {
-            console.log('Prate clicked!');
-            isPrateMode = true; // Enable "Prate" mode
-            updateImage(); // Update the image immediately
-        });
-
         // Handle region selection
         regionDropdown.addEventListener('change', (event) => {
             const selectedRegion = event.target.value;
             console.log(`Selected region: ${selectedRegion}`);
 
+            // Remove the "Prate" option if it exists
+            const prateOption = document.querySelector('#regionDropdown option[value="prate"]');
+            if (prateOption) {
+                prateOption.remove();
+            }
+
             if (selectedRegion === 'main') {
                 isPrateMode = false; // Disable "Prate" mode
                 image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${forecastSlider.value.padStart(3, '0')}.png`;
             } else if (selectedRegion === 'northeast') {
-                prateClickableContainer.style.display = 'block'; // Show "Prate" clickable text
-            } else {
-                prateClickableContainer.style.display = 'none'; // Hide "Prate" clickable text
+                isPrateMode = false; // Disable "Prate" mode
+                image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${forecastSlider.value.padStart(3, '0')}.png`;
+
+                // Add the "Prate" option dynamically
+                const prateOption = document.createElement('option');
+                prateOption.value = 'prate';
+                prateOption.textContent = 'Northeast - Prate';
+                regionDropdown.appendChild(prateOption);
+            } else if (selectedRegion === 'prate') {
+                isPrateMode = true; // Enable "Prate" mode
+                image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/northeast/png/northeast_gfs_${forecastSlider.value.padStart(3, '0')}.png`;
             }
 
             updateImage(); // Update the image
-        });
-
-        // Show the "Prate" clickable text when "Northeast" is selected
-        regionDropdown.addEventListener('change', (event) => {
-            if (event.target.value === 'northeast') {
-                prateClickableContainer.style.display = 'block';
-            } else {
-                prateClickableContainer.style.display = 'none';
-            }
         });
 
         // Add event listener for keydown events
