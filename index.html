@@ -70,6 +70,24 @@
             font-weight: bold;
             margin-bottom: 5px;
         }
+        .hidden {
+            display: none;
+        }
+        .sidebar-button {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+            text-align: center;
+            width: 100%;
+        }
+        .sidebar-button:hover {
+            background-color: #555;
+        }
 
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
@@ -101,7 +119,10 @@
 </head>
 <body>
     <div id="sidebar">
-        <!-- Sidebar is now empty -->
+        <button id="regionButton" class="sidebar-button">Region</button>
+        <div id="regionMenu" class="hidden">
+            <button id="northeastButton" class="sidebar-button">Northeast</button>
+        </div>
     </div>
     <div id="main-content">
         <header>
@@ -119,25 +140,30 @@
         const image = document.getElementById('weatherImage');
         const forecastSlider = document.getElementById('forecastSlider');
         const forecastHour = document.getElementById('forecastHour');
+        const regionButton = document.getElementById('regionButton');
+        const regionMenu = document.getElementById('regionMenu');
+        const northeastButton = document.getElementById('northeastButton');
+
+        let currentRegion = 'usa'; // Default region
 
         // Preload all images into the browser cache
-        const preloadImages = () => {
+        const preloadImages = (region) => {
             const images = [];
             for (let i = 0; i <= 384; i += 6) {
                 const step = i.toString().padStart(3, '0');
                 const img = new Image();
-                img.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
+                img.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/${region}/png/${region}_gfs_${step}.png`;
                 images.push(img);
             }
         };
 
-        // Call preloadImages on page load
-        preloadImages();
+        // Call preloadImages for the default region on page load
+        preloadImages(currentRegion);
 
         // Update the image source and forecast hour label based on the slider value
         function updateImage() {
             const step = parseInt(forecastSlider.value).toString().padStart(3, '0');
-            image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
+            image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/${currentRegion}/png/${currentRegion}_gfs_${step}.png`;
             forecastHour.textContent = step; // Update the forecast hour next to the label
         }
 
@@ -159,6 +185,19 @@
                     updateImage();
                 }
             }
+        });
+
+        // Toggle the visibility of the region menu
+        regionButton.addEventListener('click', () => {
+            regionMenu.classList.toggle('hidden');
+        });
+
+        // Switch to the northeast region
+        northeastButton.addEventListener('click', () => {
+            currentRegion = 'northeast';
+            preloadImages(currentRegion); // Preload northeast images
+            forecastSlider.value = 0; // Reset slider to the first image
+            updateImage(); // Update the displayed image
         });
     </script>
 </body>
