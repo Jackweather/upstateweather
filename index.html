@@ -74,6 +74,34 @@
         button:hover {
             background-color: #555;
         }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            #sidebar {
+                display: none; /* Hide the sidebar on smaller screens */
+            }
+
+            #main-content {
+                padding: 10px;
+            }
+
+            .image-container {
+                margin: 10px 0;
+            }
+
+            .buttons-container {
+                flex-direction: column; /* Stack buttons vertically */
+            }
+
+            button {
+                margin: 5px 0;
+                width: 100%; /* Make buttons full-width */
+            }
+        }
     </style>
 </head>
 <body>
