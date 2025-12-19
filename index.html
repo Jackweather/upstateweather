@@ -41,7 +41,7 @@
             box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
         }
 
-        #sidebar button {
+        #sidebar select {
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -54,14 +54,12 @@
             transition: background-color 0.3s, transform 0.2s;
         }
 
-        #sidebar button:hover {
+        #sidebar select:hover {
             background-color: #45a049;
-            transform: scale(1.05);
         }
 
-        #sidebar button:active {
+        #sidebar select:active {
             background-color: #3e8e41;
-            transform: scale(0.95);
         }
 
         /* Main Content */
@@ -145,8 +143,17 @@
     </header>
     <main>
         <div id="sidebar">
-            <button id="regionButton">Region</button>
-            <button id="northeastButton" class="hidden">Northeast</button>
+            <label for="regionDropdown" style="color: white; font-size: 16px; font-weight: bold;">Region</label>
+            <select id="regionDropdown">
+                <option value="" disabled selected>Select Region</option>
+                <option value="main">Main</option> <!-- Added Main option -->
+                <option value="northeast">Northeast</option>
+            </select>
+            <div id="prateClickableContainer" style="display: none; margin-top: 10px;">
+                <span id="prateClickable" style="color: white; font-size: 16px; font-weight: bold; cursor: pointer; text-decoration: underline;">
+                    Prate
+                </span>
+            </div>
         </div>
         <div id="main-content">
             <div class="image-container">
@@ -162,37 +169,102 @@
         const image = document.getElementById('weatherImage');
         const forecastSlider = document.getElementById('forecastSlider');
         const forecastHour = document.getElementById('forecastHour');
-        const regionButton = document.getElementById('regionButton');
-        const northeastButton = document.getElementById('northeastButton');
+        const regionDropdown = document.getElementById('regionDropdown');
+        const prateClickableContainer = document.getElementById('prateClickableContainer');
+        const prateClickable = document.getElementById('prateClickable');
 
-        // Toggle visibility of the "Northeast" button
-        regionButton.addEventListener('click', () => {
-            northeastButton.classList.toggle('hidden');
-        });
+        let isPrateMode = false; // Track if "Prate" mode is active
 
-        // Preload all images into the browser cache
-        const preloadImages = () => {
+        // Preload a small chunk of images for both "Main" and "Prate" modes
+        const preloadImages = (currentValue) => {
             const images = [];
-            for (let i = 0; i <= 384; i += 6) {
+            const minRange = Math.max(0, currentValue - 30); // Start 5 steps before the current value
+            const maxRange = Math.min(384, currentValue + 30); // End 5 steps after the current value
+
+            for (let i = minRange; i <= maxRange; i += 6) {
                 const step = i.toString().padStart(3, '0');
-                const img = new Image();
-                img.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
-                images.push(img);
+
+                // Preload "Main" images
+                const mainImg = new Image();
+                mainImg.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
+                images.push(mainImg);
+
+                // Preload "Prate" images
+                const prateImg = new Image();
+                prateImg.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/northeast/png/northeast_gfs_${step}.png`;
+                images.push(prateImg);
             }
         };
-
-        // Call preloadImages on page load
-        preloadImages();
 
         // Update the image source and forecast hour label based on the slider value
         function updateImage() {
             const step = parseInt(forecastSlider.value).toString().padStart(3, '0');
-            image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
+            if (isPrateMode) {
+                image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/northeast/png/northeast_gfs_${step}.png`;
+            } else {
+                image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
+            }
             forecastHour.textContent = step;
+
+            // Preload images around the current slider value
+            preloadImages(parseInt(forecastSlider.value));
         }
+
+        // Call preloadImages initially for the default slider value
+        preloadImages(parseInt(forecastSlider.value));
 
         // Event listener for the slider
         forecastSlider.addEventListener('input', updateImage);
+
+        // Add click event to "Prate"
+        prateClickable.addEventListener('click', () => {
+            console.log('Prate clicked!');
+            isPrateMode = true; // Enable "Prate" mode
+            updateImage(); // Update the image immediately
+        });
+
+        // Handle region selection
+        regionDropdown.addEventListener('change', (event) => {
+            const selectedRegion = event.target.value;
+            console.log(`Selected region: ${selectedRegion}`);
+
+            if (selectedRegion === 'main') {
+                isPrateMode = false; // Disable "Prate" mode
+                image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${forecastSlider.value.padStart(3, '0')}.png`;
+            } else if (selectedRegion === 'northeast') {
+                prateClickableContainer.style.display = 'block'; // Show "Prate" clickable text
+            } else {
+                prateClickableContainer.style.display = 'none'; // Hide "Prate" clickable text
+            }
+
+            updateImage(); // Update the image
+        });
+
+        // Show the "Prate" clickable text when "Northeast" is selected
+        regionDropdown.addEventListener('change', (event) => {
+            if (event.target.value === 'northeast') {
+                prateClickableContainer.style.display = 'block';
+            } else {
+                prateClickableContainer.style.display = 'none';
+            }
+        });
+
+        // Add event listener for keydown events
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight') {
+                // Move slider to the right (increase value)
+                if (forecastSlider.value < forecastSlider.max) {
+                    forecastSlider.value = parseInt(forecastSlider.value) + parseInt(forecastSlider.step);
+                    updateImage(); // Update the image
+                }
+            } else if (event.key === 'ArrowLeft') {
+                // Move slider to the left (decrease value)
+                if (forecastSlider.value > forecastSlider.min) {
+                    forecastSlider.value = parseInt(forecastSlider.value) - parseInt(forecastSlider.step);
+                    updateImage(); // Update the image
+                }
+            }
+        });
     </script>
 </body>
 </html>
