@@ -148,7 +148,7 @@
                 <option value="" disabled selected>Select Region</option>
                 <option value="main">Main</option>
                 <option value="northeast">Northeast</option>
-                <option value="prate">Northeast - Prate</option> <!-- Added Prate as a dropdown option -->
+                <option value="prate">Northeast - Prate</option>
             </select>
         </div>
         <div id="main-content">
@@ -214,6 +214,11 @@
         regionDropdown.addEventListener('change', (event) => {
             const selectedRegion = event.target.value;
             console.log(`Selected region: ${selectedRegion}`);
+
+            // Close the dropdown and set the selected option as the default
+            regionDropdown.blur(); // Close the dropdown
+            regionDropdown.options[0].text = regionDropdown.options[regionDropdown.selectedIndex].text; // Update the default text
+            regionDropdown.selectedIndex = 0; // Reset the dropdown to the default option
 
             // Remove the "Prate" option if it exists
             const prateOption = document.querySelector('#regionDropdown option[value="prate"]');
