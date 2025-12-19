@@ -96,7 +96,12 @@
             }
 
             #sidebar {
-                display: none; /* Hide the sidebar on smaller screens */
+                display: flex; /* Ensure the sidebar is visible on smaller screens */
+                flex-direction: column;
+                width: 100%; /* Make the sidebar full-width on mobile */
+                align-items: center;
+                background-color: #333; /* Match the desktop sidebar background */
+                padding: 10px 0;
             }
 
             #main-content {
