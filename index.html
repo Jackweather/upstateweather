@@ -127,14 +127,23 @@
             }
 
             #left-slider {
-                width: 100%;
-                flex-direction: row;
-                justify-content: center;
-                box-shadow: none;
+                width: 200px; /* Keep the width fixed */
+                flex-direction: column; /* Ensure it stays vertical */
+                position: fixed; /* Fix it to the left side */
+                top: 0;
+                left: 0;
+                height: 100%; /* Make it full height */
+                box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1); /* Restore shadow */
+            }
+
+            #toggle-slider {
+                top: 50%; /* Keep the toggle button vertically centered */
+                left: 200px; /* Adjust position relative to the slider */
             }
 
             #main-content {
                 padding: 10px;
+                margin-left: 200px; /* Add margin to prevent overlap with the slider */
             }
 
             .image-container {
