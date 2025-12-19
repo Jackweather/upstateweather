@@ -12,15 +12,6 @@
             background-color: #f5f7fa;
             height: 100vh;
         }
-        #sidebar {
-            width: 180px;
-            background: #333;
-            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
         #main-content {
             flex: 1;
             display: flex;
@@ -39,6 +30,27 @@
             padding: 10px 0;
             font-size: 24px;
             font-weight: bold;
+            position: relative;
+        }
+        .button-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .button-container button {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button-container button:hover {
+            background-color: #777;
+        }
+        .hidden {
+            display: none;
         }
         .image-container {
             display: flex;
@@ -49,7 +61,7 @@
         }
         img {
             max-width: 100%;
-            max-height: 80vh; /* Increased height for smaller screens */
+            max-height: 80vh;
             border: 2px solid #333;
             border-radius: 8px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
@@ -77,10 +89,6 @@
                 flex-direction: column;
             }
 
-            #sidebar {
-                display: none; /* Hide the sidebar on smaller screens */
-            }
-
             #main-content {
                 padding: 10px;
             }
@@ -90,21 +98,22 @@
             }
 
             img {
-                max-height: 90vh; /* Extend image height further on smaller screens */
+                max-height: 90vh;
             }
 
             input[type="range"] {
-                width: 100%; /* Make slider full-width on smaller screens */
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <div id="sidebar">
-        <!-- Sidebar is now empty -->
-    </div>
     <div id="main-content">
         <header>
+            <div class="button-container" style="position: static; display: inline-block; margin-right: 10px;">
+                <button id="regionButton">Region</button>
+                <button id="northeastButton" class="hidden">Northeast</button>
+            </div>
             Weather Model Viewer
         </header>
         <div class="image-container">
@@ -119,6 +128,13 @@
         const image = document.getElementById('weatherImage');
         const forecastSlider = document.getElementById('forecastSlider');
         const forecastHour = document.getElementById('forecastHour');
+        const regionButton = document.getElementById('regionButton');
+        const northeastButton = document.getElementById('northeastButton');
+
+        // Toggle visibility of the "Northeast" button
+        regionButton.addEventListener('click', () => {
+            northeastButton.classList.toggle('hidden');
+        });
 
         // Preload all images into the browser cache
         const preloadImages = () => {
@@ -138,7 +154,7 @@
         function updateImage() {
             const step = parseInt(forecastSlider.value).toString().padStart(3, '0');
             image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
-            forecastHour.textContent = step; // Update the forecast hour next to the label
+            forecastHour.textContent = step;
         }
 
         // Event listener for the slider
@@ -147,13 +163,11 @@
         // Add event listener for left and right arrow keys
         document.addEventListener('keydown', (event) => {
             if (event.key === 'ArrowLeft') {
-                // Decrease slider value by step if not at minimum
                 if (forecastSlider.value > parseInt(forecastSlider.min)) {
                     forecastSlider.value = parseInt(forecastSlider.value) - parseInt(forecastSlider.step);
                     updateImage();
                 }
             } else if (event.key === 'ArrowRight') {
-                // Increase slider value by step if not at maximum
                 if (forecastSlider.value < parseInt(forecastSlider.max)) {
                     forecastSlider.value = parseInt(forecastSlider.value) + parseInt(forecastSlider.step);
                     updateImage();
