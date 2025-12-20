@@ -190,12 +190,13 @@
             forecastHour.textContent = step;
         }
 
-        // Preload images for a specific region with concurrent loading
+        // Preload images for a specific region with concurrent loading and progress updates
         function preloadImagesForRegion(region) {
             const totalImages = 65; // 384 / 6 + 1
-            const promises = [];
+            let loadedCount = 0;
             const startTime = Date.now();
 
+            const promises = [];
             for (let i = 0; i <= 384; i += 6) {
                 const step = i.toString().padStart(3, '0');
                 const url = region === 'northeast-mslp-prate'
@@ -209,11 +210,31 @@
 
                     img.onload = () => {
                         cachedImages[`${region}_${step}`] = img; // Cache the image
+                        loadedCount++;
+
+                        // Update percentage and ETA dynamically
+                        const percentage = Math.round((loadedCount / totalImages) * 100);
+                        const elapsedTime = (Date.now() - startTime) / 1000; // Time in seconds
+                        const eta = ((elapsedTime / loadedCount) * (totalImages - loadedCount)).toFixed(1);
+
+                        loadingPercent.textContent = `${percentage}%`;
+                        loadingNote.textContent = `ETA: ${eta}s`;
+
                         resolve(); // Resolve the promise when the image is loaded
                     };
 
                     img.onerror = () => {
                         console.warn(`Failed to load image: ${url}`);
+                        loadedCount++;
+
+                        // Update percentage and ETA dynamically even if an image fails
+                        const percentage = Math.round((loadedCount / totalImages) * 100);
+                        const elapsedTime = (Date.now() - startTime) / 1000; // Time in seconds
+                        const eta = ((elapsedTime / loadedCount) * (totalImages - loadedCount)).toFixed(1);
+
+                        loadingPercent.textContent = `${percentage}%`;
+                        loadingNote.textContent = `ETA: ${eta}s`;
+
                         resolve(); // Resolve even if the image fails to load
                     };
                 });
@@ -221,7 +242,7 @@
                 promises.push(promise);
             }
 
-            // Use Promise.all to load all images concurrently
+            // Use Promise.all to wait for all images to load
             return Promise.all(promises).then(() => {
                 const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
                 console.log(`Preloading completed for region "${region}" in ${elapsedTime}s`);
