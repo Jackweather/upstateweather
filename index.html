@@ -11,55 +11,56 @@
             font-family: Arial, sans-serif;
             background-color: #f5f7fa;
             color: #333;
+            display: flex;
         }
 
+        /* Header */
         header {
-            background-color: #4CAF50;
+            background-color: #263159;
             color: white;
-            text-align: center;
-            padding: 15px 0;
-            font-size: 24px;
+            padding: 10px 24px;
+            font-size: 1.3em;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        main {
-            display: flex;
-            flex-direction: row;
-            height: calc(100vh - 60px); /* Full height minus header */
-        }
-
-        /* Sidebar for Computers */
+        /* Sidebar */
         #sidebar {
-            width: 250px;
-            background-color: #333;
-            color: white;
+            width: 180px;
+            background: #263159;
+            padding: 20px 0;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            align-items: flex-start;
+            min-height: 100vh;
+            margin-top: 54px; /* Adjust for fixed header */
         }
 
-        #sidebar select {
-            background-color: #4CAF50;
+        .nav-btn {
+            background-color: #374151;
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 10px 20px;
             margin: 10px 0;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+            width: 100%;
+            text-align: left;
+            font-size: 1em;
+            border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
+            transition: background-color 0.3s;
         }
 
-        #sidebar select:hover {
-            background-color: #45a049;
-        }
-
-        #sidebar select:active {
-            background-color: #3e8e41;
+        .nav-btn:hover {
+            background-color: #475569;
         }
 
         /* Main Content */
@@ -68,213 +69,272 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            justify-content: flex-start;
+            padding: 100px 0 0 0;
         }
 
         .image-container {
-            width: 100%;
-            max-width: 800px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            margin-bottom: 20px;
+            gap: 20px;
+            min-height: 300px;
         }
 
         .image-container img {
-            max-width: 100%;
-            max-height: 70vh;
-            border: 2px solid #333;
+            width: 100%;
+            max-width: 100vw;
+            max-height: 80vh;
+            height: auto;
             border-radius: 8px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+            object-fit: contain;
         }
 
         .slider-container {
-            width: 100%;
-            max-width: 800px;
+            margin-top: 24px;
+            width: 400px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
         .slider-container label {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            color: #263159;
         }
 
         .slider-container input[type="range"] {
             width: 100%;
-            margin: 10px 0;
         }
 
-        /* Mobile Styles */
-        @media (max-width: 768px) {
-            main {
-                flex-direction: column;
-            }
+        /* Loading Spinner */
+        #loading-spinner {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            width: 100%;
+            flex-direction: column;
+        }
 
-            #sidebar {
-                width: 100%;
-                height: auto;
-                flex-direction: row;
-                justify-content: space-around;
-                padding: 10px;
-                box-shadow: none;
-            }
+        #loading-spinner .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #263159;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
 
-            #main-content {
-                padding: 10px;
-            }
+        #loading-spinner #loading-percent {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #263159;
+            font-weight: bold;
+        }
 
-            .image-container img {
-                max-height: 50vh;
-            }
+        #loading-spinner #loading-note {
+            margin-top: 6px;
+            font-size: 1em;
+            color: #263159;
+            opacity: 0.85;
+        }
 
-            .slider-container input[type="range"] {
-                width: 90%;
-            }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <header>
-        Weather Model Viewer
+        <span>adkwx.com</span>
     </header>
-    <main>
-        <div id="sidebar">
-            <label for="regionDropdown" style="color: white; font-size: 16px; font-weight: bold;">Region</label>
-            <select id="regionDropdown">
-                <option value="" disabled selected>Select Region</option>
-                <option value="main">Main</option>
-                <option value="northeast">Northeast</option>
-                <option value="prate">Northeast - Prate</option>
-            </select>
+    <div id="sidebar">
+        <!-- Add a "Regions" button -->
+        <button class="nav-btn" id="regions-btn">Regions</button>
+    </div>
+    <div id="main-content">
+        <div class="image-container">
+            <img id="weatherImage" src="https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_000.png" alt="Weather Image">
         </div>
-        <div id="main-content">
-            <div class="image-container">
-                <img id="weatherImage" src="https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_000.png" alt="Weather Image">
-            </div>
-            <div class="slider-container">
-                <label for="forecastSlider">Forecast Hour: <span id="forecastHour">0</span></label>
-                <input id="forecastSlider" type="range" min="0" max="384" step="6" value="0">
-            </div>
+        <div id="loading-spinner">
+            <div class="spinner"></div>
+            <div id="loading-percent">0%</div>
+            <div id="loading-note">You can still move the slider to help load speed.</div>
         </div>
-    </main>
+        <div class="slider-container">
+            <label for="forecastSlider">Hour: <span id="forecastHour">0</span></label>
+            <input id="forecastSlider" type="range" min="0" max="384" step="6" value="0" oninput="updateImage()">
+        </div>
+    </div>
     <script>
         const image = document.getElementById('weatherImage');
         const forecastSlider = document.getElementById('forecastSlider');
         const forecastHour = document.getElementById('forecastHour');
-        const regionDropdown = document.getElementById('regionDropdown');
-
-        let isPrateMode = false; // Track if "Prate" mode is active
-
-        // Preload a small chunk of images for both "Main" and "Prate" modes
-        const preloadImages = (currentValue) => {
-            const images = [];
-            const minRange = Math.max(0, currentValue - 30); // Start 5 steps before the current value
-            const maxRange = Math.min(384, currentValue + 30); // End 5 steps after the current value
-
-            for (let i = minRange; i <= maxRange; i += 6) {
-                const step = i.toString().padStart(3, '0');
-
-                // Preload "Main" images
-                const mainImg = new Image();
-                mainImg.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
-                images.push(mainImg);
-
-                // Preload "Prate" images
-                const prateImg = new Image();
-                prateImg.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/northeast/png/northeast_gfs_${step}.png`;
-                images.push(prateImg);
-            }
-        };
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const loadingPercent = document.getElementById('loading-percent');
+        const loadingNote = document.getElementById('loading-note');
+        let currentRegion = 'main'; // Track the current region ('main' or 'northeast-mslp-prate')
+        const cachedImages = {}; // Cache for preloaded images
 
         // Update the image source and forecast hour label based on the slider value
         function updateImage() {
             const step = parseInt(forecastSlider.value).toString().padStart(3, '0');
-            if (isPrateMode) {
-                image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/northeast/png/northeast_gfs_${step}.png`;
-            } else {
-                image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
-            }
+            const baseUrl = currentRegion === 'northeast-mslp-prate'
+                ? `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/northeast/png/northeast_gfs_`
+                : `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_`;
+            image.src = `${baseUrl}${step}.png`;
             forecastHour.textContent = step;
-
-            // Preload images around the current slider value
-            preloadImages(parseInt(forecastSlider.value));
         }
 
-        // Call preloadImages initially for the default slider value
-        preloadImages(parseInt(forecastSlider.value));
+        // Preload images for a specific region with concurrent loading
+        function preloadImagesForRegion(region) {
+            const totalImages = 65; // 384 / 6 + 1
+            const promises = [];
+            const startTime = Date.now();
 
-        // Event listener for the slider
-        forecastSlider.addEventListener('input', updateImage);
+            for (let i = 0; i <= 384; i += 6) {
+                const step = i.toString().padStart(3, '0');
+                const url = region === 'northeast-mslp-prate'
+                    ? `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/northeast/png/northeast_gfs_${step}.png`
+                    : `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
 
-        // Handle region selection
-        regionDropdown.addEventListener('change', (event) => {
-            const selectedRegion = event.target.value;
-            console.log(`Selected region: ${selectedRegion}`);
+                // Create a promise for each image load
+                const promise = new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = url;
 
-            // Remove the "Prate" option if it exists
-            const prateOption = document.querySelector('#regionDropdown option[value="prate"]');
-            if (prateOption) {
-                prateOption.remove();
+                    img.onload = () => {
+                        cachedImages[`${region}_${step}`] = img; // Cache the image
+                        resolve(); // Resolve the promise when the image is loaded
+                    };
+
+                    img.onerror = () => {
+                        console.warn(`Failed to load image: ${url}`);
+                        resolve(); // Resolve even if the image fails to load
+                    };
+                });
+
+                promises.push(promise);
             }
 
-            if (selectedRegion === 'main') {
-                isPrateMode = false; // Disable "Prate" mode
-                image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${forecastSlider.value.padStart(3, '0')}.png`;
+            // Use Promise.all to load all images concurrently
+            return Promise.all(promises).then(() => {
+                const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
+                console.log(`Preloading completed for region "${region}" in ${elapsedTime}s`);
+            });
+        }
 
-                // Close the dropdown and set the selected option as the default
-                regionDropdown.blur(); // Close the dropdown
-            } else if (selectedRegion === 'northeast') {
-                isPrateMode = false; // Disable "Prate" mode
-                image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${forecastSlider.value.padStart(3, '0')}.png`;
+        // Preload "main" region images on page load
+        window.addEventListener('load', async () => {
+            // Show loading spinner
+            loadingSpinner.style.display = 'flex';
+            image.style.display = 'none';
 
-                // Add the "Prate" option dynamically
-                const prateOption = document.createElement('option');
-                prateOption.value = 'prate';
-                prateOption.textContent = 'Northeast - Prate';
-                regionDropdown.appendChild(prateOption);
+            // Preload images for the "main" region
+            await preloadImagesForRegion('main');
 
-                // Keep the dropdown open
-                setTimeout(() => {
-                    regionDropdown.size = regionDropdown.options.length; // Expand dropdown
-                }, 0);
-            } else if (selectedRegion === 'prate') {
-                isPrateMode = true; // Enable "Prate" mode
-                image.src = `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/northeast/png/northeast_gfs_${forecastSlider.value.padStart(3, '0')}.png`;
-
-                // Close the dropdown and set the selected option as the default
-                regionDropdown.blur(); // Close the dropdown
-            }
+            // Hide loading spinner and show the image
+            loadingSpinner.style.display = 'none';
+            image.style.display = 'block';
 
             updateImage(); // Update the image
         });
 
-        // Add an event listener to collapse the dropdown when the user clicks outside
-        document.addEventListener('click', (event) => {
-            if (!regionDropdown.contains(event.target)) {
-                regionDropdown.size = 1; // Collapse dropdown
+        // Event listener for the slider
+        forecastSlider.addEventListener('input', updateImage);
+
+        // Add event listener to the "Regions" button
+        const regionsBtn = document.getElementById('regions-btn');
+        regionsBtn.addEventListener('click', () => {
+            // Check if the "USA" button already exists
+            if (!document.getElementById('usa-btn')) {
+                const usaBtn = document.createElement('button');
+                usaBtn.id = 'usa-btn';
+                usaBtn.className = 'nav-btn';
+                usaBtn.textContent = 'USA';
+                document.getElementById('sidebar').appendChild(usaBtn);
+
+                // Add event listener to the "USA" button
+                usaBtn.addEventListener('click', async () => {
+                    currentRegion = 'main'; // Switch back to the 'main' region
+                    forecastSlider.value = 0; // Reset slider to the first image
+
+                    // Show loading spinner
+                    loadingSpinner.style.display = 'flex';
+                    image.style.display = 'none';
+
+                    // Preload images
+                    await preloadImagesForRegion(currentRegion);
+
+                    // Hide loading spinner and show the image
+                    loadingSpinner.style.display = 'none';
+                    image.style.display = 'block';
+
+                    updateImage(); // Update the image
+                });
+            }
+
+            // Check if the "Northeast" button already exists
+            if (!document.getElementById('northeast-btn')) {
+                const northeastBtn = document.createElement('button');
+                northeastBtn.id = 'northeast-btn';
+                northeastBtn.className = 'nav-btn';
+                northeastBtn.textContent = 'Northeast';
+                document.getElementById('sidebar').appendChild(northeastBtn);
+
+                // Add event listener to the "Northeast" button
+                northeastBtn.addEventListener('click', () => {
+                    // Do not change the region or URL here, just show the "MSLP & Prate" button
+                    if (!document.getElementById('northeast-type-btn')) {
+                        const northeastTypeBtn = document.createElement('button');
+                        northeastTypeBtn.id = 'northeast-type-btn';
+                        northeastTypeBtn.className = 'nav-btn';
+                        northeastTypeBtn.textContent = 'MSLP & Prate';
+                        document.getElementById('sidebar').appendChild(northeastTypeBtn);
+
+                        // Add event listener to the "MSLP & Prate" button
+                        northeastTypeBtn.addEventListener('click', async () => {
+                            currentRegion = 'northeast-mslp-prate'; // Switch to the 'northeast-mslp-prate' region
+                            forecastSlider.value = 0; // Reset slider to the first image
+
+                            // Show loading spinner
+                            loadingSpinner.style.display = 'flex';
+                            image.style.display = 'none';
+
+                            // Preload images
+                            await preloadImagesForRegion(currentRegion);
+
+                            // Hide loading spinner and show the image
+                            loadingSpinner.style.display = 'none';
+                            image.style.display = 'block';
+
+                            updateImage(); // Update the image
+                        });
+                    }
+                });
             }
         });
 
-        // Add an event listener to reset dropdown size when it gains focus
-        regionDropdown.addEventListener('focus', () => {
-            regionDropdown.size = 1; // Ensure dropdown starts collapsed
+        // Add event listener to enable arrow key control when clicking anywhere on the page
+        document.body.addEventListener('click', () => {
+            document.body.focus(); // Ensure the body element is focused to capture key events
         });
 
-        // Add event listener for keydown events
+        // Add event listener for keydown events to control the slider with arrow keys
         document.addEventListener('keydown', (event) => {
             if (event.key === 'ArrowRight') {
                 // Move slider to the right (increase value)
-                if (forecastSlider.value < forecastSlider.max) {
+                if (parseInt(forecastSlider.value) < parseInt(forecastSlider.max)) {
                     forecastSlider.value = parseInt(forecastSlider.value) + parseInt(forecastSlider.step);
                     updateImage(); // Update the image
                 }
             } else if (event.key === 'ArrowLeft') {
                 // Move slider to the left (decrease value)
-                if (forecastSlider.value > forecastSlider.min) {
+                if (parseInt(forecastSlider.value) > parseInt(forecastSlider.min)) {
                     forecastSlider.value = parseInt(forecastSlider.value) - parseInt(forecastSlider.step);
                     updateImage(); // Update the image
                 }
