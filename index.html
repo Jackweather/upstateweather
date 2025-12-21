@@ -190,11 +190,11 @@
                 : `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_`;
             const imageKey = `${currentRegion}_${step}`;
 
-            // Use cached image if available
+            // Use cached image if available, otherwise fetch from URL with a cache-busting query parameter
+            const timestamp = new Date().getTime(); // Cache-busting query parameter
             if (cachedImages[imageKey]) {
-                image.src = cachedImages[imageKey].src;
+                image.src = `${cachedImages[imageKey].src}?ts=${timestamp}`;
             } else {
-                const timestamp = new Date().getTime(); // Cache-busting query parameter
                 image.src = `${baseUrl}${step}.png?ts=${timestamp}`;
             }
             forecastHour.textContent = step;
@@ -224,9 +224,13 @@
                         cachedImages[`${region}_${step}`] = img; // Cache the image
                         loadedCount++;
 
-                        // Update percentage dynamically
+                        // Update percentage and ETA dynamically
                         const percentage = Math.round((loadedCount / totalImages) * 100);
+                        const elapsedTime = (Date.now() - startTime) / 1000; // Time in seconds
+                        const eta = ((elapsedTime / loadedCount) * (totalImages - loadedCount)).toFixed(1);
+
                         loadingPercent.textContent = `${percentage}%`;
+                        loadingNote.textContent = `ETA: ${eta}s`;
 
                         resolve(); // Resolve the promise when the image is loaded
                     };
@@ -235,9 +239,13 @@
                         console.warn(`Failed to load image: ${url}`);
                         loadedCount++;
 
-                        // Update percentage dynamically even if an image fails
+                        // Update percentage and ETA dynamically even if an image fails
                         const percentage = Math.round((loadedCount / totalImages) * 100);
+                        const elapsedTime = (Date.now() - startTime) / 1000; // Time in seconds
+                        const eta = ((elapsedTime / loadedCount) * (totalImages - loadedCount)).toFixed(1);
+
                         loadingPercent.textContent = `${percentage}%`;
+                        loadingNote.textContent = `ETA: ${eta}s`;
 
                         resolve(); // Resolve even if the image fails to load
                     };
@@ -255,6 +263,10 @@
 
         // Preload "main" region images on page load
         window.addEventListener('load', async () => {
+            // Add a cache-busting query parameter to the initial image
+            const timestamp = new Date().getTime(); // Generate a unique timestamp
+            image.src = `${image.src}?ts=${timestamp}`;
+
             // Show loading spinner
             loadingSpinner.style.display = 'flex';
             image.style.display = 'none';
