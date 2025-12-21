@@ -191,10 +191,10 @@
             const imageKey = `${currentRegion}_${step}`;
 
             // Use cached image if available, otherwise fetch from URL with a cache-busting query parameter
+            const timestamp = new Date().getTime(); // Cache-busting query parameter
             if (cachedImages[imageKey]) {
-                image.src = cachedImages[imageKey].src;
+                image.src = `${cachedImages[imageKey].src}?ts=${timestamp}`;
             } else {
-                const timestamp = new Date().getTime(); // Cache-busting query parameter
                 image.src = `${baseUrl}${step}.png?ts=${timestamp}`;
             }
             forecastHour.textContent = step;
@@ -263,6 +263,10 @@
 
         // Preload "main" region images on page load
         window.addEventListener('load', async () => {
+            // Add a cache-busting query parameter to the initial image
+            const timestamp = new Date().getTime(); // Generate a unique timestamp
+            image.src = `${image.src}?ts=${timestamp}`;
+
             // Show loading spinner
             loadingSpinner.style.display = 'flex';
             image.style.display = 'none';
