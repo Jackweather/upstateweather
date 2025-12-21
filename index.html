@@ -188,7 +188,15 @@
                 : currentRegion === 'usa-mslp-diff'
                 ? `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp_dif/pngs/mslp_diff_`
                 : `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_`;
-            image.src = `${baseUrl}${step}.png`;
+            const imageKey = `${currentRegion}_${step}`;
+
+            // Use cached image if available, otherwise fetch from URL with a cache-busting query parameter
+            if (cachedImages[imageKey]) {
+                image.src = cachedImages[imageKey].src;
+            } else {
+                const timestamp = new Date().getTime(); // Cache-busting query parameter
+                image.src = `${baseUrl}${step}.png?ts=${timestamp}`;
+            }
             forecastHour.textContent = step;
         }
 
