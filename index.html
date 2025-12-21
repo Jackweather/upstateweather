@@ -185,6 +185,8 @@
             const step = parseInt(forecastSlider.value).toString().padStart(3, '0');
             const baseUrl = currentRegion === 'northeast-mslp-prate'
                 ? `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/northeast/png/northeast_gfs_`
+                : currentRegion === 'usa-mslp-diff'
+                ? `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp_dif/pngs/mslp_diff_`
                 : `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_`;
             image.src = `${baseUrl}${step}.png`;
             forecastHour.textContent = step;
@@ -201,6 +203,8 @@
                 const step = i.toString().padStart(3, '0');
                 const url = region === 'northeast-mslp-prate'
                     ? `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/northeast/png/northeast_gfs_${step}.png`
+                    : region === 'usa-mslp-diff'
+                    ? `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp_dif/pngs/mslp_diff_${step}.png`
                     : `https://weather-data21.s3.us-east-2.amazonaws.com/GFS_output/mslp/png/usa_gfs_${step}.png`;
 
                 // Create a promise for each image load
@@ -280,22 +284,76 @@
                 document.getElementById('sidebar').appendChild(usaBtn);
 
                 // Add event listener to the "USA" button
-                usaBtn.addEventListener('click', async () => {
-                    currentRegion = 'main'; // Switch back to the 'main' region
-                    forecastSlider.value = 0; // Reset slider to the first image
+                usaBtn.addEventListener('click', () => {
+                    // Check if the "MSLP & Prate" button already exists
+                    if (!document.getElementById('usa-mslp-prate-btn')) {
+                        const usaMslpPrateBtn = document.createElement('button');
+                        usaMslpPrateBtn.id = 'usa-mslp-prate-btn';
+                        usaMslpPrateBtn.className = 'nav-btn';
+                        usaMslpPrateBtn.textContent = 'MSLP & Prate';
 
-                    // Show loading spinner
-                    loadingSpinner.style.display = 'flex';
-                    image.style.display = 'none';
+                        // Insert the "MSLP & Prate" button above the "Northeast" button
+                        const northeastBtn = document.getElementById('northeast-btn');
+                        if (northeastBtn) {
+                            document.getElementById('sidebar').insertBefore(usaMslpPrateBtn, northeastBtn);
+                        } else {
+                            document.getElementById('sidebar').appendChild(usaMslpPrateBtn);
+                        }
 
-                    // Preload images
-                    await preloadImagesForRegion(currentRegion);
+                        // Add event listener to the "MSLP & Prate" button
+                        usaMslpPrateBtn.addEventListener('click', async () => {
+                            currentRegion = 'main'; // Set the region to 'main'
+                            forecastSlider.value = 0; // Reset slider to the first image
 
-                    // Hide loading spinner and show the image
-                    loadingSpinner.style.display = 'none';
-                    image.style.display = 'block';
+                            // Show loading spinner
+                            loadingSpinner.style.display = 'flex';
+                            image.style.display = 'none';
 
-                    updateImage(); // Update the image
+                            // Preload images
+                            await preloadImagesForRegion(currentRegion);
+
+                            // Hide loading spinner and show the image
+                            loadingSpinner.style.display = 'none';
+                            image.style.display = 'block';
+
+                            updateImage(); // Update the image
+                        });
+                    }
+
+                    // Check if the "MSLP Diff" button already exists
+                    if (!document.getElementById('usa-mslp-diff-btn')) {
+                        const usaMslpDiffBtn = document.createElement('button');
+                        usaMslpDiffBtn.id = 'usa-mslp-diff-btn';
+                        usaMslpDiffBtn.className = 'nav-btn';
+                        usaMslpDiffBtn.textContent = 'MSLP Diff';
+
+                        // Insert the "MSLP Diff" button above the "Northeast" button
+                        const northeastBtn = document.getElementById('northeast-btn');
+                        if (northeastBtn) {
+                            document.getElementById('sidebar').insertBefore(usaMslpDiffBtn, northeastBtn);
+                        } else {
+                            document.getElementById('sidebar').appendChild(usaMslpDiffBtn);
+                        }
+
+                        // Add event listener to the "MSLP Diff" button
+                        usaMslpDiffBtn.addEventListener('click', async () => {
+                            currentRegion = 'usa-mslp-diff'; // Set the region to 'usa-mslp-diff'
+                            forecastSlider.value = 6; // Reset slider to the first image (006)
+
+                            // Show loading spinner
+                            loadingSpinner.style.display = 'flex';
+                            image.style.display = 'none';
+
+                            // Preload images for the "MSLP Diff" region
+                            await preloadImagesForRegion(currentRegion);
+
+                            // Hide loading spinner and show the image
+                            loadingSpinner.style.display = 'none';
+                            image.style.display = 'block';
+
+                            updateImage(); // Update the image
+                        });
+                    }
                 });
             }
 
