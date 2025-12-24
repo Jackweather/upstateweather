@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Model Viewer - NAM</title>
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+        }
+
+        /* Header */
+        header {
+            background-color: #263159;
+            color: white;
+            padding: 10px 24px;
+            font-size: 1.3em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Sidebar */
+        #sidebar {
+            width: 180px;
+            background: #263159;
+            padding: 20px 0;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin-top: 54px; /* Adjust for fixed header */
+        }
+
+        .nav-btn {
+            background-color: #374151;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 0;
+            width: 100%;
+            text-align: left;
+            font-size: 1em;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .nav-btn:hover {
+            background-color: #475569;
+        }
+
+        /* Main Content */
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 100px 0 0 0;
+        }
+
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            min-height: 300px;
+        }
+
+        .image-container img {
+            width: 100%;
+            max-width: 100vw;
+            max-height: 80vh;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+            object-fit: contain;
+        }
+
+        .slider-container {
+            margin-top: 24px;
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .slider-container label {
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            color: #263159;
+        }
+
+        .slider-container input[type="range"] {
+            width: 100%;
+        }
+
+        /* Loading Spinner */
+        #loading-spinner {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            width: 100%;
+            flex-direction: column;
+        }
+
+        #loading-spinner .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #263159;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        #loading-spinner #loading-percent {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #263159;
+            font-weight: bold;
+        }
+
+        #loading-spinner #loading-note {
+            margin-top: 6px;
+            font-size: 1em;
+            color: #263159;
+            opacity: 0.85;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <span>adkwx.com - NAM</span>
+    </header>
+    <div id="sidebar">
+        <button class="nav-btn" id="regions-btn">Regions</button>
+        <!-- Add a "Switch to Main" button -->
+        <button class="nav-btn" id="switch-to-main-btn">Switch to GFS</button>
+    </div>
+    <div id="main-content">
+        <div class="image-container">
+            <img id="weatherImage" src="https://weather-data21.s3.us-east-2.amazonaws.com/NAM_output/mslp/png/nam_000.png" alt="Weather Image">
+        </div>
+        <div id="loading-spinner">
+            <div class="spinner"></div>
+            <div id="loading-percent">0%</div>
+            <div id="loading-note">You can still move the slider to help load speed.</div>
+        </div>
+        <div class="slider-container">
+            <label for="forecastSlider">Hour: <span id="forecastHour">0</span></label>
+            <input id="forecastSlider" type="range" min="0" max="84" step="1" value="0" oninput="updateImage()">
+        </div>
+    </div>
+    <script>
+        const image = document.getElementById('weatherImage');
+        const forecastSlider = document.getElementById('forecastSlider');
+        const forecastHour = document.getElementById('forecastHour');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const loadingPercent = document.getElementById('loading-percent');
+        const loadingNote = document.getElementById('loading-note');
+        const cachedImages = {};
+        const baseUrl = "https://weather-data21.s3.us-east-2.amazonaws.com/NAM_output/mslp/png/nam_";
+
+        // Update the image source and forecast hour label based on the slider value
+        function updateImage() {
+            let step = parseInt(forecastSlider.value);
+            if (step > 36) {
+                step = Math.ceil((step - 36) / 3) * 3 + 36; // Adjust step for values above 36
+            }
+            const paddedStep = step.toString().padStart(3, '0');
+            image.src = `${baseUrl}${paddedStep}.png`;
+            forecastHour.textContent = paddedStep;
+        }
+
+        // Preload images for the NAM model
+        function preloadImages() {
+            const totalImages = 85; // 84 + 1
+            let loadedCount = 0;
+            const startTime = Date.now();
+
+            const promises = [];
+            for (let i = 0; i <= 84; i++) {
+                const step = i.toString().padStart(3, '0');
+                const url = `${baseUrl}${step}.png`;
+
+                const promise = new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = url;
+
+                    img.onload = () => {
+                        cachedImages[step] = img;
+                        loadedCount++;
+
+                        const percentage = Math.round((loadedCount / totalImages) * 100);
+                        const elapsedTime = (Date.now() - startTime) / 1000;
+                        const eta = ((elapsedTime / loadedCount) * (totalImages - loadedCount)).toFixed(1);
+
+                        loadingPercent.textContent = `${percentage}%`;
+                        loadingNote.textContent = `ETA: ${eta}s`;
+
+                        resolve();
+                    };
+
+                    img.onerror = () => {
+                        console.warn(`Failed to load image: ${url}`);
+                        loadedCount++;
+
+                        const percentage = Math.round((loadedCount / totalImages) * 100);
+                        const elapsedTime = (Date.now() - startTime) / 1000;
+                        const eta = ((elapsedTime / loadedCount) * (totalImages - loadedCount)).toFixed(1);
+
+                        loadingPercent.textContent = `${percentage}%`;
+                        loadingNote.textContent = `ETA: ${eta}s`;
+
+                        resolve();
+                    };
+                });
+
+                promises.push(promise);
+            }
+
+            return Promise.all(promises).then(() => {
+                const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
+                console.log(`Preloading completed in ${elapsedTime}s`);
+            });
+        }
+
+        // Preload images on page load
+        window.addEventListener('load', async () => {
+            loadingSpinner.style.display = 'flex';
+            image.style.display = 'none';
+
+            await preloadImages();
+
+            loadingSpinner.style.display = 'none';
+            image.style.display = 'block';
+
+            updateImage();
+        });
+
+        // Event listener for the slider
+        forecastSlider.addEventListener('input', updateImage);
+
+        // Adjust the slider's behavior dynamically
+        forecastSlider.addEventListener('input', () => {
+            const value = parseInt(forecastSlider.value);
+            if (value > 36) {
+                forecastSlider.step = 3; // Set step to 3 after 36
+            } else {
+                forecastSlider.step = 1; // Set step to 1 for 0-36
+            }
+            updateImage();
+        });
+
+        // Add event listener to the "Regions" button
+        const regionsBtn = document.getElementById('regions-btn');
+        regionsBtn.addEventListener('click', () => {
+            if (!document.getElementById('usa-btn')) {
+                const usaBtn = document.createElement('button');
+                usaBtn.id = 'usa-btn';
+                usaBtn.className = 'nav-btn';
+                usaBtn.textContent = 'USA';
+                document.getElementById('sidebar').appendChild(usaBtn);
+
+                usaBtn.addEventListener('click', () => {
+                    forecastSlider.value = 0;
+                    updateImage();
+                });
+            }
+        });
+
+        // Add event listener to the "Switch to Main" button
+        const switchToMainBtn = document.getElementById('switch-to-main-btn');
+        switchToMainBtn.addEventListener('click', () => {
+            window.location.href = 'index.html'; // Redirect to the main page
+        });
+
+        // Add event listener for keydown events to control the slider with arrow keys
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight') {
+                // Move slider to the right (increase value)
+                if (parseInt(forecastSlider.value) < parseInt(forecastSlider.max)) {
+                    forecastSlider.value = parseInt(forecastSlider.value) + parseInt(forecastSlider.step);
+                    updateImage(); // Update the image
+                }
+            } else if (event.key === 'ArrowLeft') {
+                // Move slider to the left (decrease value)
+                if (parseInt(forecastSlider.value) > parseInt(forecastSlider.min)) {
+                    forecastSlider.value = parseInt(forecastSlider.value) - parseInt(forecastSlider.step);
+                    updateImage(); // Update the image
+                }
+            }
+        });
+    </script>
+</body>
+</html>
