@@ -157,6 +157,8 @@
         <button class="nav-btn" id="regions-btn">Regions</button>
         <!-- Add a "Clear Cache" button -->
         <button class="nav-btn" id="clear-cache-btn">Clear Cache</button>
+        <!-- Add a "Switch to NAM" button -->
+        <button class="nav-btn" id="switch-to-nam-btn">Switch to NAM</button>
     </div>
     <div id="main-content">
         <div class="image-container">
@@ -435,6 +437,12 @@
             currentRegion = 'main'; // Reset to the default region
             forecastSlider.value = 0; // Reset slider to the first image
             updateImage(); // Update the image
+        });
+
+        // Add event listener to the "Switch to NAM" button
+        const switchToNamBtn = document.getElementById('switch-to-nam-btn');
+        switchToNamBtn.addEventListener('click', () => {
+            window.location.href = 'NAm.html'; // Redirect to the NAM page
         });
     </script>
 </body>
