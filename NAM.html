@@ -247,8 +247,18 @@
             });
         }
 
+        // Function to clear the cache
+        function clearCache() {
+            for (const key in cachedImages) {
+                delete cachedImages[key];
+            }
+            console.log('Cache cleared.');
+        }
+
         // Preload images on page load
         window.addEventListener('load', async () => {
+            clearCache(); // Clear the cache on page load
+
             loadingSpinner.style.display = 'flex';
             image.style.display = 'none';
 
@@ -318,6 +328,11 @@
                     updateImage(); // Update the image
                 }
             }
+        });
+
+        // Add event listener to enable arrow key control when clicking anywhere on the page
+        document.body.addEventListener('click', () => {
+            document.body.focus(); // Ensure the body element is focused to capture key events
         });
     </script>
 </body>
