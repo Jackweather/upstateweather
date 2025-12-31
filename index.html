@@ -159,6 +159,8 @@
         <button class="nav-btn" id="clear-cache-btn">Clear Cache</button>
         <!-- Add a "Switch to NAM" button -->
         <button class="nav-btn" id="switch-to-nam-btn">Switch to NAM</button>
+        <!-- Add a "Switch to HRRR" button -->
+        <button class="nav-btn" id="switch-to-hrrr-btn">Switch to HRRR</button>
     </div>
     <div id="main-content">
         <div class="image-container">
@@ -444,7 +446,12 @@
         switchToNamBtn.addEventListener('click', () => {
             window.location.href = 'NAM.html'; // Redirect to the NAM page
         });
+
+        // Add event listener to the "Switch to HRRR" button
+        const switchToHrrrBtn = document.getElementById('switch-to-hrrr-btn');
+        switchToHrrrBtn.addEventListener('click', () => {
+            window.location.href = 'Hrrr.html'; // Redirect to the HRRR page
+        });
     </script>
 </body>
 </html>
-
