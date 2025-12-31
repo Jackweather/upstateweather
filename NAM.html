@@ -156,6 +156,8 @@
         <button class="nav-btn" id="regions-btn">Regions</button>
         <!-- Add a "Switch to Main" button -->
         <button class="nav-btn" id="switch-to-main-btn">Switch to GFS</button>
+        <!-- Add a "Switch to HRRR" button -->
+        <button class="nav-btn" id="switch-to-hrrr-btn">Switch to HRRR</button>
     </div>
     <div id="main-content">
         <div class="image-container">
@@ -293,6 +295,12 @@
         const switchToMainBtn = document.getElementById('switch-to-main-btn');
         switchToMainBtn.addEventListener('click', () => {
             window.location.href = 'index.html'; // Redirect to the main page
+        });
+
+        // Add event listener to the "Switch to HRRR" button
+        const switchToHrrrBtn = document.getElementById('switch-to-hrrr-btn');
+        switchToHrrrBtn.addEventListener('click', () => {
+            window.location.href = 'Hrrr.html'; // Redirect to the HRRR page
         });
 
         // Add event listener for keydown events to control the slider with arrow keys
