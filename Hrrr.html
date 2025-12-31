@@ -240,8 +240,18 @@
             });
         }
 
+        // Function to clear the cache
+        function clearCache() {
+            for (const key in cachedImages) {
+                delete cachedImages[key];
+            }
+            console.log('Cache cleared.');
+        }
+
         // Preload images on page load
         window.addEventListener('load', async () => {
+            clearCache(); // Clear the cache on page load
+
             loadingSpinner.style.display = 'flex';
             image.style.display = 'none';
 
@@ -266,6 +276,28 @@
         const switchToNamBtn = document.getElementById('switch-to-nam-btn');
         switchToNamBtn.addEventListener('click', () => {
             window.location.href = 'NAm.html'; // Redirect to the NAM page
+        });
+
+        // Add event listener for keydown events to control the slider with arrow keys
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight') {
+                // Move slider to the right (increase value)
+                if (parseInt(forecastSlider.value) < parseInt(forecastSlider.max)) {
+                    forecastSlider.value = parseInt(forecastSlider.value) + parseInt(forecastSlider.step);
+                    updateImage(); // Update the image
+                }
+            } else if (event.key === 'ArrowLeft') {
+                // Move slider to the left (decrease value)
+                if (parseInt(forecastSlider.value) > parseInt(forecastSlider.min)) {
+                    forecastSlider.value = parseInt(forecastSlider.value) - parseInt(forecastSlider.step);
+                    updateImage(); // Update the image
+                }
+            }
+        });
+
+        // Add event listener to enable arrow key control when clicking anywhere on the page
+        document.body.addEventListener('click', () => {
+            document.body.focus(); // Ensure the body element is focused to capture key events
         });
     </script>
 </body>
