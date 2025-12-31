@@ -153,13 +153,11 @@
         <span>adkwx.com</span>
     </header>
     <div id="sidebar">
-        <!-- Add a "Regions" button -->
+        <!-- Remove the "Clear Cache" button -->
         <button class="nav-btn" id="regions-btn">Regions</button>
-        <!-- Add a "Clear Cache" button -->
-        <button class="nav-btn" id="clear-cache-btn">Clear Cache</button>
         <!-- Add a "Switch to NAM" button -->
         <button class="nav-btn" id="switch-to-nam-btn">Switch to NAM</button>
-        <!-- Add a "Switch to HRRR" button -->
+        <!-- Add the "Switch to HRRR" button -->
         <button class="nav-btn" id="switch-to-hrrr-btn">Switch to HRRR</button>
     </div>
     <div id="main-content">
@@ -259,8 +257,18 @@
             });
         }
 
+        // Function to clear the cache
+        function clearCache() {
+            for (const key in cachedImages) {
+                delete cachedImages[key];
+            }
+            console.log('Cache cleared.');
+        }
+
         // Preload "main" region images on page load
         window.addEventListener('load', async () => {
+            clearCache(); // Clear the cache on page load
+
             // Show loading spinner
             loadingSpinner.style.display = 'flex';
             image.style.display = 'none';
@@ -424,21 +432,6 @@
                     updateImage(); // Update the image
                 }
             }
-        });
-
-        // Add event listener to the "Clear Cache" button
-        const clearCacheBtn = document.getElementById('clear-cache-btn');
-        clearCacheBtn.addEventListener('click', () => {
-            // Clear the cachedImages object
-            for (const key in cachedImages) {
-                delete cachedImages[key];
-            }
-            console.log('Cache cleared.');
-
-            // Reset the image source to the default
-            currentRegion = 'main'; // Reset to the default region
-            forecastSlider.value = 0; // Reset slider to the first image
-            updateImage(); // Update the image
         });
 
         // Add event listener to the "Switch to NAM" button
